@@ -1,0 +1,10 @@
+{
+  "name": "Revis�o Ativa",
+  "short_name": "Revis�o",
+  "description": "Flashcards e revis�es espa�adas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#18243d",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
