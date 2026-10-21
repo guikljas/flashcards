@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Component, type ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bell, BookOpen, Check, ChevronLeft, ChevronRight, Cloud, CloudOff, GraduationCap, Home, Layers, LogIn, Plus, Settings, X } from 'lucide-react'
 import { loadCards, loadSettings, saveCards, saveSettings } from './storage'
 import { supabase, syncCards } from './supabase'
@@ -11,7 +11,7 @@ const now = () => new Date().toISOString()
 const isDue = (card: Card) => !card.deletedAt && Date.parse(card.nextReview) <= Date.now()
 const intervals = [1, 3, 7, 14, 30, 60]
 
-export default function App() {
+function FlashcardsApp() {
   const [view, setView] = useState<View>('home')
   const [cards, setCards] = useState<Card[]>(loadCards)
   const [settings, setSettings] = useState(loadSettings)
@@ -93,6 +93,17 @@ export default function App() {
     <nav className="bottom-nav"><NavButton icon={<Home/>} label="Início" selected={view === 'home'} onClick={() => setView('home')} /><NavButton icon={<BookOpen/>} label="Estudar" selected={view === 'study'} onClick={() => { setStudyIndex(0); setView('study') }} /><button className="add-button" onClick={() => setShowCreate(true)} aria-label="Criar flashcard"><Plus/></button><NavButton icon={<Layers/>} label="Cartões" selected={view === 'cards'} onClick={() => setView('cards')} /><NavButton icon={<Settings/>} label="Ajustes" selected={view === 'settings'} onClick={() => setView('settings')} /></nav>
     {showCreate && <CreateModal onClose={() => setShowCreate(false)} onCreate={addCard} />}
   </main>
+}
+
+export default function App() { return <AppErrorBoundary><FlashcardsApp /></AppErrorBoundary> }
+
+class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false }
+  static getDerivedStateFromError() { return { hasError: true } }
+  render() {
+    if (this.state.hasError) return <main className="app-error"><Layers size={38}/><h1>Vamos recarregar seu estudo</h1><p>Seus cartões salvos continuam guardados. Atualize para voltar ao app.</p><button className="primary" onClick={() => window.location.reload()}>Atualizar aplicativo</button></main>
+    return this.props.children
+  }
 }
 
 function HomePage({ due, active, studied, goal, setView, setShowCreate, subjects, cards, onSubject, onInstall }: { due: number; active: number; studied: number; goal: number; setView: (view: View) => void; setShowCreate: (value: boolean) => void; subjects: string[]; cards: Card[]; onSubject: (name: string) => void; onInstall?: () => void }) {

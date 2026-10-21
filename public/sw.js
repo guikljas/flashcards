@@ -1,4 +1,4 @@
-const CACHE = 'mente-em-dia-v2';
+const CACHE = 'mente-em-dia-v3';
 const ASSETS = ['/manifest.webmanifest', '/icon.svg'];
 self.addEventListener('install', (event) => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS))); self.skipWaiting(); });
 self.addEventListener('activate', (event) => event.waitUntil(
