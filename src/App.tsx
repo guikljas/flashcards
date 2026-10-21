@@ -57,24 +57,24 @@ function FlashcardsApp() {
     return () => window.clearInterval(timer)
   }, [dueCards.length, settings.reminderHour])
 
-  async function sync() {
+  async function sync(cardsToSync: Card[] = cards) {
     if (!supabase) return
     const { data } = await supabase.auth.getUser()
     if (!data.user) return
-    try { setSyncState('syncing'); const merged = await syncCards(cards, data.user.id); setCards(merged); setSyncState('synced') }
+    try { setSyncState('syncing'); const merged = await syncCards(cardsToSync, data.user.id); setCards(merged); setSyncState('synced') }
     catch { setSyncState('error') }
   }
   function addCard(data: Pick<Card, 'subject' | 'question' | 'answer'>) {
     const card: Card = { id: newId(), ...data, nextReview: now(), intervalDays: 0, repetitions: 0, updatedAt: now() }
-    setCards(current => [card, ...current]); setShowCreate(false); if (userEmail) setTimeout(() => void sync(), 50)
+    setCards(current => { const updated = [card, ...current]; if (userEmail) void sync(updated); return updated }); setShowCreate(false)
   }
   function rate(card: Card, quality: 'again' | 'hard' | 'good') {
     const interval = quality === 'again' ? 0 : quality === 'hard' ? Math.max(1, Math.ceil(card.intervalDays * 1.4)) : intervals[Math.min(card.repetitions, intervals.length - 1)]
     const next = new Date(); next.setDate(next.getDate() + interval)
-    setCards(current => current.map(item => item.id === card.id ? { ...item, intervalDays: interval, repetitions: quality === 'again' ? 0 : item.repetitions + 1, nextReview: next.toISOString(), updatedAt: now() } : item))
-    setFlipped(false); setStudyIndex(index => index + 1); if (userEmail) setTimeout(() => void sync(), 50)
+    setCards(current => { const updated = current.map(item => item.id === card.id ? { ...item, intervalDays: interval, repetitions: quality === 'again' ? 0 : item.repetitions + 1, nextReview: next.toISOString(), updatedAt: now() } : item); if (userEmail) void sync(updated); return updated })
+    setFlipped(false); setStudyIndex(index => index + 1)
   }
-  function removeCard(card: Card) { setCards(current => current.map(item => item.id === card.id ? { ...item, deletedAt: now(), updatedAt: now() } : item)); if (userEmail) setTimeout(() => void sync(), 50) }
+  function removeCard(card: Card) { setCards(current => { const updated = current.map(item => item.id === card.id ? { ...item, deletedAt: now(), updatedAt: now() } : item); if (userEmail) void sync(updated); return updated }) }
   async function requestNotifications() {
     if (!('Notification' in window)) return alert('Este navegador não oferece notificações.')
     const permission = await Notification.requestPermission()
