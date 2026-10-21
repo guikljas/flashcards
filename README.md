@@ -1,4 +1,4 @@
-# Revis�o Ativa
+# Mente em Dia
 
 PWA de flashcards para estudo escolar, com cria��o de cart�es por mat�ria, revis�o espa�ada, funcionamento offline e sincroniza��o entre computador e celular.
 

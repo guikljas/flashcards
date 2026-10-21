@@ -1,7 +1,7 @@
 {
-  "name": "Revis�o Ativa",
-  "short_name": "Revis�o",
-  "description": "Flashcards e revis�es espa�adas.",
+  "name": "Mente em Dia",
+  "short_name": "Mente",
+  "description": "Flashcards e revisões espaçadas.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f7fb",
